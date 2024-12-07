@@ -3,12 +3,16 @@
 resource "aws_msk_cluster" "leonardo" {
   cluster_name           = "leonardo-cluster"
   kafka_version          = "3.6.0" 
-  number_of_broker_nodes = 1
+  number_of_broker_nodes = 2
 
   broker_node_group_info {
     instance_type   = "kafka.t3.small"
-    client_subnets  = ["subnet-0758fd9a205ea1af5"]
-    security_groups = ["sg-12345678"]
+    client_subnets  = [
+                        replace(jsonencode(local.my_secret_object.SUBNET_1), "\"", ""),
+                        replace(jsonencode(local.my_secret_object.SUBNET_2), "\"", ""),
+                        #replace(jsonencode(local.my_secret_object.SUBNET_3), "\"", "")
+                    ]
+    security_groups = [aws_security_group.kafka.id]
   }
 
   encryption_info {
@@ -22,7 +26,7 @@ resource "aws_msk_cluster" "leonardo" {
     broker_logs {
       cloudwatch_logs {
         enabled   = true
-        log_group = "msk-log-group" # Replace with your CloudWatch log group name
+        log_group = aws_cloudwatch_log_group.leonardo.name
       }
     }
   }
