@@ -1,0 +1,67 @@
+version: '3.8'
+services:
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:latest
+    hostname: control-center
+    container_name: control-center
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: "b-2.leonardocluster.y4rywa.c20.kafka.us-east-1.amazonaws.com:9094,b-1.leonardocluster.y4rywa.c20.kafka.us-east-1.amazonaws.com:9094"
+      CONTROL_CENTER_CONNECT_CLUSTER: "http://connect:8083"
+      CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONTROL_CENTER_METRICS_TOPIC_REPLICATION: 2
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 2
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 2
+      CONTROL_CENTER_REPLICATION_FACTOR: 2
+      CONTROL_CENTER_SECURITY_PROTOCOL: "SSL"
+      CONTROL_CENTER_SSL_TRUSTSTORE_LOCATION: "/etc/kafka/secrets/msk-truststore.jks"
+      CONTROL_CENTER_SSL_TRUSTSTORE_PASSWORD: "truststore-password"
+    volumes:
+      - "./msk-truststore.jks:/etc/kafka/secrets/msk-truststore.jks"
+    depends_on:
+      - schema-registry
+      - connect
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:latest
+    hostname: schema-registry
+    container_name: schema-registry
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "b-2.leonardocluster.y4rywa.c20.kafka.us-east-1.amazonaws.com:9094,b-1.leonardocluster.y4rywa.c20.kafka.us-east-1.amazonaws.com:9094"
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: "SSL"
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: "/etc/kafka/secrets/msk-truststore.jks"
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: "truststore-password"
+    volumes:
+      - "./msk-truststore.jks:/etc/kafka/secrets/msk-truststore.jks"
+
+  connect:
+    image: confluentinc/cp-kafka-connect:latest
+    hostname: connect
+    container_name: connect
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: "b-2.leonardocluster.y4rywa.c20.kafka.us-east-1.amazonaws.com:9094,b-1.leonardocluster.y4rywa.c20.kafka.us-east-1.amazonaws.com:9094"
+      CONNECT_SECURITY_PROTOCOL: "SSL"
+      CONNECT_SSL_TRUSTSTORE_LOCATION: "/etc/kafka/secrets/msk-truststore.jks"
+      CONNECT_SSL_TRUSTSTORE_PASSWORD: "truststore-password"
+      CONNECT_GROUP_ID: "connect-cluster"
+      CONNECT_CONFIG_STORAGE_TOPIC: "connect-configs"
+      CONNECT_OFFSET_STORAGE_TOPIC: "connect-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "connect-statuses"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 2
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 2
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 2
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_PORT: 8083
+      CONNECT_REST_ADVERTISED_HOST_NAME: "54.226.5.121"
+      CONNECT_REST_HOST_NAME: "0.0.0.0"
+    volumes:
+      - "./msk-truststore.jks:/etc/kafka/secrets/msk-truststore.jks"
