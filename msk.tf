@@ -22,6 +22,13 @@ resource "aws_msk_cluster" "leonardo" {
     }
   }
 
+  client_authentication {
+    sasl {
+      iam = true
+    }
+    unauthenticated = false
+  }
+
   logging_info {
     broker_logs {
       cloudwatch_logs {
@@ -41,3 +48,5 @@ output "zookeeper_connect_string_tls" {
   description = "The Zookeeper connection string with TLS"
   value       = aws_msk_cluster.leonardo.zookeeper_connect_string_tls
 }
+
+#bin/kafka-topics.sh --list --bootstrap-server 54.157.175.115
