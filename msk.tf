@@ -13,6 +13,12 @@ resource "aws_msk_cluster" "leonardo" {
                         #replace(jsonencode(local.my_secret_object.SUBNET_3), "\"", "")
                     ]
     security_groups = [aws_security_group.kafka.id]
+
+    connectivity_info {
+      public_access {
+        type = "SERVICE_PROVIDED_EIPS"
+      }
+    }
   }
 
   encryption_info {
