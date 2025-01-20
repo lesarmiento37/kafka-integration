@@ -28,4 +28,4 @@ jobs:
       # Step 4: Print the current stage
       - name: Print Stage
         run: | 
-          echo "Current stage: ${{ env.stage }}"
+          echo "Current stage: ${stage}"
