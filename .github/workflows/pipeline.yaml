@@ -1,6 +1,6 @@
 name: Hello World Pipeline
 
-# Trigger the workflow on manual dispatch, push to the staging branch, or pull request to the main branch
+# Trigger the workflow on workflow dispatch, push to staging, or pull request to main
 on:
   workflow_dispatch:
     inputs:
@@ -26,11 +26,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Define the stage (if triggered by workflow_dispatch)
-      - name: Define Stage
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: echo "stage=${{ github.event.inputs.stage }}" >> $GITHUB_ENV
-
-      # Step 3: Print the current stage
+      # Step 2: Print Stage
       - name: Print Stage
-        run: echo "Current stage: ${{ env.stage }}"
+        run: |
+          if [ "${{ github.event.inputs.stage }}" ]; then
+            echo "Current stage: ${{ github.event.inputs.stage }}"
+          else
+            echo "Current stage: Staging or Pull Request to Main"
+          fi
