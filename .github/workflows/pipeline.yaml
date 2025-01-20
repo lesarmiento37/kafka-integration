@@ -11,6 +11,7 @@ on:
   push:
     branches:
       - staging
+      - develop
   pull_request:
     branches:
       - main
@@ -39,6 +40,8 @@ jobs:
             echo "stage=staging" >> $GITHUB_ENV
           elif [[ "${{ github.ref_name }}" == "main" ]]; then
             echo "stage=production" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "develop" ]]; then
+            echo "stage=develop" >> $GITHUB_ENV
           else
             echo "stage=unknown" >> $GITHUB_ENV
           fi
