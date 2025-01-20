@@ -1,0 +1,23 @@
+name: Manual Trigger Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"
+        required: true
+        default: "develop"
+
+jobs:
+  manual-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }} # Checkout the specific branch
+
+      - name: Run Job
+        run: |
+          echo "Manually triggered job for branch: ${{ github.event.inputs.branch }}"
