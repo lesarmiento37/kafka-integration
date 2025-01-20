@@ -4,8 +4,8 @@ name: Hello World Pipeline
 on:
   push:
     branches:
-      - staging
-      - develop
+      - stagin
+      - develo
   pull_request:
     branches:
       - main
