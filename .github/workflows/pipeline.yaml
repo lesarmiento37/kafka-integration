@@ -1,12 +1,6 @@
 name: Hello World Pipeline
 
 on:
-  workflow_dispatch:
-    inputs:
-      stage:
-        description: "Deployment stage"
-        required: true
-        default: "development"
   push:
     branches:
       - develop
@@ -24,29 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Define the stage for workflow_dispatch
-      - name: Define Stage for workflow_dispatch
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: echo "stage=${{ github.event.inputs.stage }}" >> $GITHUB_ENV
-
-      # Step 3: Define the stage for push or pull_request
-      - name: Define Stage for Branches
-        if: ${{ github.event_name != 'workflow_dispatch' }}
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            if [[ "${{ github.head_ref }}" == "develop" ]]; then
-              echo "stage=production" >> $GITHUB_ENV
-            else
-              echo "stage=unknown" >> $GITHUB_ENV
-            fi
-          elif [[ "${{ github.ref_name }}" == "develop" ]]; then
-            echo "stage=development" >> $GITHUB_ENV
-          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
-            echo "stage=staging" >> $GITHUB_ENV
-          else
-            echo "stage=unknown" >> $GITHUB_ENV
-
       # Step 4: Print the current stage
       - name: Print Stage
         run: |
-          echo "Current stage: ${{ env.stage }}"
+          echo "Current stage: ${{ github.head_ref }}"
