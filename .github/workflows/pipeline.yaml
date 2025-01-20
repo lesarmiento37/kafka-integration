@@ -1,19 +1,22 @@
 name: Hello World Pipeline
 
-# Trigger the workflow on manual dispatch, push to the staging branch, or pull request to the main branch
 on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "Deployment stage"
+        required: true
+        default: "development"
   push:
     branches:
-      - staging
       - develop
+      - staging
   pull_request:
     branches:
       - main
 
-# Define the jobs in the pipeline
 jobs:
   hello-world-job:
-    # Use the latest Ubuntu runner
     runs-on: ubuntu-latest
 
     steps:
@@ -21,19 +24,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 3: Define stage based on branch for push or pull_request
-      - name: Define Stage for branch
-        if: ${{ github.event_name != 'workflow_dispatch' }}
+      # Step 2: Define the stage for workflow_dispatch
+      - name: Define Stage for workflow_dispatch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "stage=${{ github.event.inputs.stage }}" >> $GITHUB_ENV
+
+      # Step 3: Define the stage for pull_request or push events
+      - name: Define Stage for Branches
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
         run: |
-          if [[ "${{ github.ref_name }}" == "staging" ]]; then
-            echo "stage=staging" >> $GITHUB_ENV
-          elif [[ "${{ github.ref_name }}" == "main" ]]; then
-            echo "stage=production" >> $GITHUB_ENV
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            if [[ "${{ github.head_ref }}" == "develop" ]]; then
+              echo "stage=production" >> $GITHUB_ENV
+            fi
           elif [[ "${{ github.ref_name }}" == "develop" ]]; then
-            echo "stage=develop" >> $GITHUB_ENV
+            echo "stage=development" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "stage=staging" >> $GITHUB_ENV
           else
             echo "stage=unknown" >> $GITHUB_ENV
-          fi
 
       # Step 4: Print the current stage
       - name: Print Stage
