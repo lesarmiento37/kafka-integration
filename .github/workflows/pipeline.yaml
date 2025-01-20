@@ -29,13 +29,15 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: echo "stage=${{ github.event.inputs.stage }}" >> $GITHUB_ENV
 
-      # Step 3: Define the stage for pull_request or push events
+      # Step 3: Define the stage for push or pull_request
       - name: Define Stage for Branches
-        if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             if [[ "${{ github.head_ref }}" == "develop" ]]; then
               echo "stage=production" >> $GITHUB_ENV
+            else
+              echo "stage=unknown" >> $GITHUB_ENV
             fi
           elif [[ "${{ github.ref_name }}" == "develop" ]]; then
             echo "stage=development" >> $GITHUB_ENV
@@ -46,5 +48,4 @@ jobs:
 
       # Step 4: Print the current stage
       - name: Print Stage
-        run: | 
-          echo "Current stage: ${{ env.stage }}"
+        run: echo "Current stage: ${{ env.stage }}"
