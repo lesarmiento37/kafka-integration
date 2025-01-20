@@ -32,4 +32,5 @@ jobs:
 
       # Step 3: Print the current stage
       - name: Print Stage
-        run: echo "Current stage: ${{ GITHUB_ENV }}"
+        run:  | 
+          echo "Current stage: ${{ env.stage }}"
