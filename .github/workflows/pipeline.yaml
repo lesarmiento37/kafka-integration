@@ -1,0 +1,31 @@
+name: Hello World Pipeline
+
+# Trigger the workflow on push or pull requests to the main branch
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "Deployment stage"
+        required: true
+        default: "development"
+  push:
+    branches:
+      - staging
+  pull_request:
+    branches:
+      - main
+
+# Define the jobs in the pipeline
+jobs:
+  hello-world-job:
+    # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Run the Hello World script
+      - name: Print Stage
+        run: echo "Current stage: ${{ github.event.inputs.stage }}
