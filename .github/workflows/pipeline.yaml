@@ -26,11 +26,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Print Stage
+      - name: Define Stage
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "stage=${{ github.event.inputs.stage }}" >> $GITHUB_ENV
+
+      # Step 3: Print the current stage
       - name: Print Stage
-        run: |
-          if [ "${{ github.event.inputs.stage }}" ]; then
-            echo "Current stage: ${{ github.event.inputs.stage }}"
-          else
-            echo "Current stage: Staging or Pull Request to Main"
-          fi
+        run: echo "Current stage: ${{ GITHUB_ENV }}"
