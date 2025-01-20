@@ -22,10 +22,6 @@ jobs:
         uses: actions/checkout@v3
 
       # Step 3: Define stage based on branch for push or pull_request
-      - name: Define Stage for branch
+      - name: Print Stage for branch
         run: |
-          export stage="${{ github.ref_name }}"
-      # Step 4: Print the current stage
-      - name: Print Stage
-        run: | 
-          echo "Current stage: ${stage}"
+          echo "${{ github.ref_name }}"
